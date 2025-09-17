@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(120deg, #3498db, #8e44ad); /* Consistent gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.1); /* Glass effect */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 480px; /* Slightly wider for the extra field */
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .register-container h2 {
+            text-align: center;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-control {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 0;
+            color: #ffffff;
+            font-size: 1rem;
+            padding-left: 35px; /* Space for the icon */
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control:focus {
+            background: transparent;
+            color: #ffffff;
+            box-shadow: none;
+            border-bottom-color: #ffffff;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .password-toggle:hover {
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            border-radius: 25px;
+            padding: 10px 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .login-link a {
+            color: #ffffff;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        #error-message {
+            color: #ffcccc;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h2>Create Account</h2>
+    <form id="registerForm" th:action="@{/saveUser}" th:object="${user}" method="post">
+        <div class="input-group-custom">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Username" required/>
+        </div>
+        <div class="input-group-custom">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Password" required/>
+            <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+        <div class="input-group-custom">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required/>
+            <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+        </div>
+        
+        <div id="error-message">Passwords do not match!</div>
+        
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+    
+    <div class="login-link">
+        Already have an account? <a th:href="@{/login}">Back to Login</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const registerForm = document.getElementById('registerForm');
+        const passwordField = document.getElementById('password');
+        const confirmPasswordField = document.getElementById('confirmPassword');
+        const errorMessage = document.getElementById('error-message');
+
+        // Function to toggle password visibility
+        const createPasswordToggle = (passwordInput, toggleIcon) => {
+            toggleIcon.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        };
+
+        // Apply toggle to both password fields
+        createPasswordToggle(passwordField, document.getElementById('togglePassword'));
+        createPasswordToggle(confirmPasswordField, document.getElementById('toggleConfirmPassword'));
+        
+        // ## Client-side validation for matching passwords ##
+        registerForm.addEventListener('submit', function(event) {
+            if (passwordField.value !== confirmPasswordField.value) {
+                // Prevent the form from submitting
+                event.preventDefault();
+                
+                // Show the error message
+                errorMessage.style.display = 'block';
+                
+                // Add a visual shake effect for feedback
+                document.querySelector('.register-container').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.register-container').style.animation = '';
+                }, 500);
+
+            } else {
+                // Hide error message if they match
+                errorMessage.style.display = 'none';
+            }
+        });
+    });
+</script>
+<style>
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+</style>
+</body>
+</html>

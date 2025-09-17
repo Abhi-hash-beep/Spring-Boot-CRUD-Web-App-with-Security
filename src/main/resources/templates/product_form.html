@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc); /* Dual-tone purple to blue */
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #343a40;
+        }
+        .btn {
+            transition: all 0.3s ease-in-out;
+            border-radius: 20px;
+            padding: 10px 25px;
+        }
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .form-control:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.4);
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Product Information</h2>
+    <form th:action="@{/save}" th:object="${product}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group">
+            <label>Product Name:</label>
+            <input type="text" th:field="*{name}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Brand:</label>
+            <input type="text" th:field="*{brand}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Price:</label>
+            <input type="number" step="0.01" th:field="*{price}" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/products}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simple form validation feedback on submit (optional)
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            // Check if the form is valid according to HTML5 validation rules
+            if (form.checkValidity()) {
+                // You could add a 'loading' state here if needed
+                console.log('Form is valid and is being submitted.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
